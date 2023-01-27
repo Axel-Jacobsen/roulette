@@ -9,7 +9,8 @@
 
 # 'TODO's and thoughts
 #
-# - It would be sweet to be able to add / configure tools (e.g. mypy, whatever else)
+# - It would be sweet to be able to add / configure tools (e.g. mypy, ruff, whatever else)
+#   - have a processor that takes input from these and configures them to the same format?
 # - Configure FIXME / TODO whatever else?
 # - How to make it cross platform? Where is shuf supported?
 
