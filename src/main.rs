@@ -1,11 +1,21 @@
+/* Many lines of un-idiomatic Rust
+ */
+
 use std::io;
-use std::process::Command;
+use std::borrow::Cow;
 use std::process::Output;
+use std::process::Command;
+
+use shell_escape::unix::escape;
+
 
 fn synth_or(strs: Vec<String>) -> String {
     let or_expr = strs
         .into_iter()
-        .reduce(|cur: String, nxt: String| cur + "|" + &nxt)
+        .reduce(|cur, nxt| {
+            let escaped_next = escape(Cow::Owned(nxt));
+            cur + "|" + &escaped_next
+        })
         .expect("somehow failed to concat strings together!");
 
     format!("({})", or_expr)
@@ -17,7 +27,7 @@ fn git_grep(strs: Vec<String>) -> io::Result<Output> {
 }
 
 fn main() {
-    let vs: Vec<String> = ["FIXME", "TODO"].map(String::from).to_vec();
+    let vs = ["FIXME", "TODO"].map(String::from).to_vec();
     let res = git_grep(vs);
     println!("{:?}", res);
 }
@@ -28,8 +38,8 @@ mod main_tests {
 
     #[test]
     fn basic_symbol_freq() {
-        let vs: Vec<String> = ["FIXME", "TODO", "test", ":)"].map(String::from).to_vec();
+        let vs = ["FIXME", "TODO", "test", ":)"].map(String::from).to_vec();
         let res = synth_or(vs);
-        assert_eq!(res, "(FIXME|TODO|test|:))");
+        assert_eq!(res, "(FIXME|TODO|test|':)')");
     }
 }
