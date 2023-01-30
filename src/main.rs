@@ -1,35 +1,24 @@
 /* Many lines of un-idiomatic Rust
  */
 
-use std::io;
-use std::borrow::Cow;
-use std::process::Output;
-use std::process::Command;
+mod commands;
 
-use shell_escape::unix::escape;
-
-
-fn synth_or(strs: Vec<String>) -> String {
-    let or_expr = strs
-        .into_iter()
-        .reduce(|cur, nxt| {
-            let escaped_next = escape(Cow::Owned(nxt));
-            cur + "|" + &escaped_next
-        })
-        .expect("somehow failed to concat strings together!");
-
-    format!("({})", or_expr)
-}
-
-fn git_grep(strs: Vec<String>) -> io::Result<Output> {
-    let grep_str = synth_or(strs);
-    Command::new("git").arg("grep").arg("-niE").arg(grep_str).output()
+fn vecu8_to_string(vs: Vec<u8>) -> String {
+    String::from_utf8(vs).unwrap()
 }
 
 fn main() {
     let vs = ["FIXME", "TODO"].map(String::from).to_vec();
-    let res = git_grep(vs);
-    println!("{:?}", res);
+
+    let res = commands::git_grep(vs).unwrap();
+
+    let stdout_str = vecu8_to_string(res.stdout);
+
+    let r = commands::handle_git_grep(&stdout_str);
+
+    for i in r {
+        println!("{:?}", i);
+    }
 }
 
 #[cfg(test)]
