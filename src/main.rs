@@ -1,11 +1,12 @@
 /* Many lines of un-idiomatic Rust
  */
 
-mod commands;
-
+use rand::Rng;
 use std::io::Write;
+
 use termcolor::{ColorChoice, StandardStream};
 
+mod commands;
 
 fn main() -> std::io::Result<()> {
     let mut stdout = StandardStream::stdout(ColorChoice::Always);
@@ -14,9 +15,9 @@ fn main() -> std::io::Result<()> {
 
     match commands::git_grep(vs) {
         Ok(vals) => {
-            for line in vals {
-                writeln!(&mut stdout,"{}", line)?;
-            }
+            let lucky_number = rand::thread_rng().gen_range(0..vals.len());
+            let line = &vals[lucky_number];
+            writeln!(&mut stdout, "{}", line)?;
         }
         Err(_) => println!("log io error for git_grep"),
     }

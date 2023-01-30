@@ -1,5 +1,5 @@
-use std::io;
 use std::borrow::Cow;
+use std::io;
 use std::process::Command;
 
 use shell_escape::unix::escape;
