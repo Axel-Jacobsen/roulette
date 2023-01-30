@@ -1,7 +1,6 @@
 use std::borrow::Cow;
 use std::io;
 use std::process::Command;
-use std::process::Output;
 
 use shell_escape::unix::escape;
 
@@ -17,17 +16,18 @@ fn synth_or(strs: Vec<String>) -> String {
     format!("({})", or_expr)
 }
 
-pub fn git_grep(strs: Vec<String>) -> io::Result<Output> {
+pub fn git_grep(strs: Vec<String>) -> io::Result<Vec<String>> {
     let grep_str = synth_or(strs);
-    Command::new("git")
+    let command_output = Command::new("git")
         .arg("grep")
         .arg("-niE")
         .arg(grep_str)
-        .output()
-}
+        .output()?;
 
-pub fn handle_git_grep<'a>(stdout: &'a String) -> std::str::Split<&'a str> {
-    // the output is from stdout, so I *think* it is safe to assume
-    // that it is valid utf-8... for now...
-    stdout.split("\n")
+    // assume stdout has valid utf8
+    Ok(String::from_utf8(command_output.stdout)
+        .unwrap()
+        .split("\n")
+        .map(String::from)
+        .collect())
 }

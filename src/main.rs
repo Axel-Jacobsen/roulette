@@ -3,18 +3,10 @@
 
 mod commands;
 
-fn vecu8_to_string(vs: Vec<u8>) -> String {
-    String::from_utf8(vs).unwrap()
-}
-
 fn main() {
     let vs = ["FIXME", "TODO"].map(String::from).to_vec();
 
-    let res = commands::git_grep(vs).unwrap();
-
-    let stdout_str = vecu8_to_string(res.stdout);
-
-    let r = commands::handle_git_grep(&stdout_str);
+    let r = commands::git_grep(vs).unwrap();
 
     for i in r {
         println!("{:?}", i);
