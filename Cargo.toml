@@ -7,3 +7,4 @@ edition = "2021"
 
 [dependencies]
 shell-escape = "0.1.5"
+termcolor = "1.2.0"  # BurntSushi!

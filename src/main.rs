@@ -3,14 +3,25 @@
 
 mod commands;
 
-fn main() {
+use std::io::Write;
+use termcolor::{ColorChoice, StandardStream};
+
+
+fn main() -> std::io::Result<()> {
+    let mut stdout = StandardStream::stdout(ColorChoice::Always);
+
     let vs = ["FIXME", "TODO"].map(String::from).to_vec();
 
-    let r = commands::git_grep(vs).unwrap();
-
-    for i in r {
-        println!("{:?}", i);
+    match commands::git_grep(vs) {
+        Ok(vals) => {
+            for line in vals {
+                writeln!(&mut stdout,"{}", line)?;
+            }
+        }
+        Err(_) => println!("log io error for git_grep"),
     }
+
+    Ok(())
 }
 
 #[cfg(test)]

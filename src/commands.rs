@@ -1,5 +1,5 @@
-use std::borrow::Cow;
 use std::io;
+use std::borrow::Cow;
 use std::process::Command;
 
 use shell_escape::unix::escape;
@@ -20,6 +20,7 @@ pub fn git_grep(strs: Vec<String>) -> io::Result<Vec<String>> {
     let grep_str = synth_or(strs);
     let command_output = Command::new("git")
         .arg("grep")
+        .arg("--color=always")
         .arg("-niE")
         .arg(grep_str)
         .output()?;
@@ -29,5 +30,6 @@ pub fn git_grep(strs: Vec<String>) -> io::Result<Vec<String>> {
         .unwrap()
         .split("\n")
         .map(String::from)
+        .filter(|s| s != "")
         .collect())
 }
