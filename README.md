@@ -22,6 +22,13 @@ Once that is done, navigate to the root of your directory and run
 roulette
 ```
 
+and you'll get something like this!
+
+```console
+Number of 'pockets': 13
+README.md:8:- whatever TODO, FIXME, or type error you get, you must fix!
+```
+
 ## Supported Commands
 
 - `git grep -niE "(TODO|FIXME)"`
