@@ -13,6 +13,7 @@ categories = ["command-line-utilities"]
 
 [[bin]]
 name = "roulette"
+path = "src/main.rs"
 test = false
 bench = false
 
