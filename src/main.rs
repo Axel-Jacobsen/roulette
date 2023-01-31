@@ -1,7 +1,7 @@
 use std::io::Write;
 
 use rand::Rng;
-use termcolor::{WriteColor, ColorSpec, ColorChoice, StandardStream};
+use termcolor::{ColorChoice, ColorSpec, StandardStream, WriteColor};
 
 mod commands;
 

@@ -20,6 +20,9 @@ fn convert_output_to_vec_of_strs(output: Output) -> Vec<String> {
     // the lang and change this accordingly?
     // output.stdout is Vec<u8>, so maybe we output
     // a Vec<u8> too?
+    // TODO return an iterable so we can do further operations
+    // on the output. If no further operations are needed, the
+    // calling function can `collect`.
     String::from_utf8(output.stdout)
         .expect("non-utf8 output from terminal")
         .split("\n")
@@ -53,23 +56,22 @@ pub fn mypy() -> io::Result<Vec<String>> {
     // path/to/file.rs:107: error: blah blah
     // path/to/file.rs:107: note: friend is a four letter word
     //
-    // We want to keep the 'error' line, but get rid of the 'note' lines
+    // We want to keep the 'error' lines, but get rid of the 'note' lines
 
     let mypy_line_output_regex =
-        Regex::new(r"(?P<file_and_line>/?[a-zA-Z0-9_\-\./]+:\d+:) (?P<mypy_type>error|note):").unwrap();
+        Regex::new(r"(?P<file_and_line>/?[a-zA-Z0-9_\-\./]+:\d+:) (?P<mypy_type>error|note):")
+            .expect("invalid regex!");
 
-    let gah = convert_output_to_vec_of_strs(command_output)
+    Ok(convert_output_to_vec_of_strs(command_output)
         .into_iter()
         .filter(|line| {
-                let captures = match mypy_line_output_regex.captures(&line) {
-                    Some(c) => c,
-                    None => return false,
-                };
-                &captures["mypy_type"] == "note"
-            }
-        ).collect();
-
-    Ok(gah)
+            let captures = match mypy_line_output_regex.captures(&line) {
+                Some(c) => c,
+                None => return false, // add 'DEBUG' option to program and log this case!
+            };
+            &captures["mypy_type"] != "error"
+        })
+        .collect())
 }
 
 #[cfg(test)]
