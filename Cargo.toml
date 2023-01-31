@@ -11,9 +11,12 @@ repository = "https://github.com/Axel-Jacobsen/roulette"
 keywords = ["cli"]
 categories = ["command-line-utilities"]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[[bin]]
+name = "roulette"
+test = false
+bench = false
 
 [dependencies]
 shell-escape = "0.1.5"
-termcolor = "1.2.0"  # BurntSushi!
+termcolor = "1.2.0"
 rand = "0.8.5"
