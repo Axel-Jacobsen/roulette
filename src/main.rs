@@ -19,9 +19,18 @@ fn main() -> std::io::Result<()> {
 
     let total_len = vals.len();
 
-    stdout.set_color(ColorSpec::new().set_fg(Some(Color::Blue)).set_bold(true))?;
+    let mut color_spec = ColorSpec::new();
+    color_spec.set_fg(Some(Color::Blue));
+    stdout.set_color(&color_spec)?;
 
-    writeln!(&mut stdout, "Number of 'pockets': {}", total_len)?;
+    write!(&mut stdout, "Number of 'pockets': ")?;
+
+    stdout.set_color(ColorSpec::new().set_bold(true))?;
+
+    writeln!(&mut stdout, "{}", total_len)?;
+
+    color_spec.clear();
+    stdout.set_color(&color_spec)?;
 
     let lucky_number = rand::thread_rng().gen_range(0..total_len);
     let line = &vals[lucky_number];
