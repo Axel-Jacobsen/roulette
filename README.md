@@ -4,7 +4,7 @@
 
 Rules:
 
-- spin the wheel with "./roulette.sh"
+- spin the wheel with `roulette`
 - whatever TODO, FIXME, or type error you get, you must fix!
 - total number of TODOs, FIXMEs, or type error must go down
 
