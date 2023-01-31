@@ -35,7 +35,6 @@ What else?
 
 ## TODO
 
-- print total num. errors (e.g. 'size of wheel')
 - how to find commands to use?
 - Is UTF-8 OK for character interpretation?
 - stdout is interpreted as `Vec<u8>` - is this the 'natural' way to manage terminal output?
