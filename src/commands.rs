@@ -3,15 +3,14 @@ use std::io;
 use std::process::Command;
 use std::process::Output;
 
+use regex::Regex;
 use shell_escape::unix::escape;
 
 fn synth_or(strs: Vec<String>) -> String {
-    let or_expr = strs
-        .into_iter()
-        .fold("".to_string(), |cur, nxt| {
-            let escaped_next = escape(Cow::Owned(nxt));
-            cur + "|" + &escaped_next
-        });
+    let or_expr = strs.into_iter().fold("".to_string(), |cur, nxt| {
+        let escaped_next = escape(Cow::Owned(nxt));
+        cur + "|" + &escaped_next
+    });
 
     format!("({})", &or_expr[1..])
 }
@@ -50,7 +49,30 @@ pub fn mypy() -> io::Result<Vec<String>> {
         .arg("--no-error-summary")
         .output()?;
 
-    Ok(convert_output_to_vec_of_strs(command_output))
+    // e.g.
+    // path/to/file.rs:107: error: blah blah
+    // path/to/file.rs:107: note: friend is a four letter word
+    //
+    // We want to keep the 'error' line, but get rid of the 'note' lines
+
+    let mypy_line_output_regex =
+        Regex::new(r"(?P<file_and_line>/?[a-zA-Z0-9_\-\./]+:\d+:) (?P<mypy_type>error|note):").unwrap();
+
+    let gah = convert_output_to_vec_of_strs(command_output)
+        .into_iter()
+        .filter(|line| {
+                let captures = match mypy_line_output_regex.captures(&line) {
+                    Some(c) => c,
+                    None => {
+                        println!("warning: skipping line {}", &line);
+                        return false;
+                    },
+                };
+                &captures["mypy_type"] == "note"
+            }
+        ).collect();
+
+    Ok(gah)
 }
 
 #[cfg(test)]
