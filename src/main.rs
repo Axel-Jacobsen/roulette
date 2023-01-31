@@ -1,10 +1,6 @@
-/* Many lines of un-idiomatic Rust
- */
-
 use rand::Rng;
 use std::io::Write;
-
-use termcolor::{ColorChoice, StandardStream};
+use termcolor::{Color, WriteColor, ColorSpec, ColorChoice, StandardStream};
 
 mod commands;
 
@@ -22,6 +18,10 @@ fn main() -> std::io::Result<()> {
     }
 
     let total_len = vals.len();
+
+    stdout.set_color(ColorSpec::new().set_fg(Some(Color::Blue)).set_bold(true))?;
+
+    writeln!(&mut stdout, "Number of 'pockets': {}", total_len)?;
 
     let lucky_number = rand::thread_rng().gen_range(0..total_len);
     let line = &vals[lucky_number];
