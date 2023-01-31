@@ -8,13 +8,12 @@ use shell_escape::unix::escape;
 fn synth_or(strs: Vec<String>) -> String {
     let or_expr = strs
         .into_iter()
-        .reduce(|cur, nxt| {
+        .fold("".to_string(), |cur, nxt| {
             let escaped_next = escape(Cow::Owned(nxt));
             cur + "|" + &escaped_next
-        })
-        .expect("somehow failed to concat strings together!");
+        });
 
-    format!("({})", or_expr)
+    format!("({})", &or_expr[1..])
 }
 
 fn convert_output_to_vec_of_strs(output: Output) -> Vec<String> {
