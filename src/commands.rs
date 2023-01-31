@@ -18,6 +18,10 @@ fn synth_or(strs: Vec<String>) -> String {
 }
 
 fn convert_output_to_vec_of_strs(output: Output) -> Vec<String> {
+    // TODO when will we get non-utf-8? Can we detect
+    // the lang and change this accordingly?
+    // output.stdout is Vec<u8>, so maybe we output
+    // a Vec<u8> too?
     String::from_utf8(output.stdout)
         .expect("non-utf8 output from terminal")
         .split("\n")
