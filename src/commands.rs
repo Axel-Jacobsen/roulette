@@ -1,6 +1,7 @@
 use std::borrow::Cow;
 use std::io;
 use std::process::Command;
+use std::process::Output;
 
 use shell_escape::unix::escape;
 
@@ -16,6 +17,15 @@ fn synth_or(strs: Vec<String>) -> String {
     format!("({})", or_expr)
 }
 
+fn convert_output_to_vec_of_strs(output: Output) -> Vec<String> {
+    String::from_utf8(output.stdout)
+        .expect("non-utf8 output from terminal")
+        .split("\n")
+        .map(String::from)
+        .filter(|s| s != "")
+        .collect()
+}
+
 pub fn git_grep(strs: Vec<String>) -> io::Result<Vec<String>> {
     let grep_str = synth_or(strs);
     let command_output = Command::new("git")
@@ -26,10 +36,26 @@ pub fn git_grep(strs: Vec<String>) -> io::Result<Vec<String>> {
         .output()?;
 
     // assume stdout has valid utf8
-    Ok(String::from_utf8(command_output.stdout)
-        .unwrap()
-        .split("\n")
-        .map(String::from)
-        .filter(|s| s != "")
-        .collect())
+    Ok(convert_output_to_vec_of_strs(command_output))
+}
+
+pub fn mypy() -> io::Result<Vec<String>> {
+    let command_output = Command::new("mypy")
+        .arg(".")
+        .arg("--no-error-summary")
+        .output()?;
+
+    Ok(convert_output_to_vec_of_strs(command_output))
+}
+
+#[cfg(test)]
+mod main_tests {
+    use crate::commands::synth_or;
+
+    #[test]
+    fn basic_symbol_freq() {
+        let vs = ["FIXME", "TODO", "test", ":)"].map(String::from).to_vec();
+        let res = synth_or(vs);
+        assert_eq!(res, "(FIXME|TODO|test|':)')");
+    }
 }

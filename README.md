@@ -17,3 +17,12 @@ Inspired by (i.e. copied from) Andreas Kling's [FIXME Roulette](https://www.yout
 ## Soon-to-be Supported Commands
 
 - `mypy`
+- `ruff`
+
+What else?
+
+## TODO
+
+- how to find commands to use?
+- Is UTF-8 OK for character interpretation?
+- stdout is interpreted as `Vec<u8>` - is this the 'natural' way to manage terminal output?
