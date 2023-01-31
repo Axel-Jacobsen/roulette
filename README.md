@@ -18,7 +18,9 @@ cargo install fixme-roulette
 
 Once that is done, navigate to the root of your directory and run
 
-`roulette`
+```console
+roulette
+```
 
 ## Supported Commands
 
