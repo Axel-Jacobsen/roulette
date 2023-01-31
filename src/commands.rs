@@ -63,10 +63,7 @@ pub fn mypy() -> io::Result<Vec<String>> {
         .filter(|line| {
                 let captures = match mypy_line_output_regex.captures(&line) {
                     Some(c) => c,
-                    None => {
-                        println!("warning: skipping line {}", &line);
-                        return false;
-                    },
+                    None => return false,
                 };
                 &captures["mypy_type"] == "note"
             }
