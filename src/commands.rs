@@ -26,7 +26,8 @@ fn convert_output_to_vec_of_strs(output: Output) -> Vec<String> {
         .collect()
 }
 
-pub fn git_grep(strs: Vec<String>) -> io::Result<Vec<String>> {
+pub fn git_grep() -> io::Result<Vec<String>> {
+    let strs = ["FIXME", "TODO"].map(String::from).to_vec();
     let grep_str = synth_or(strs);
     let command_output = Command::new("git")
         .arg("grep")

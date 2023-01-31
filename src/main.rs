@@ -11,16 +11,21 @@ mod commands;
 fn main() -> std::io::Result<()> {
     let mut stdout = StandardStream::stdout(ColorChoice::Always);
 
-    let vs = ["FIXME", "TODO"].map(String::from).to_vec();
+    let mut vals: Vec<String> = vec![];
+    let funcs = [commands::git_grep, commands::mypy];
 
-    match commands::git_grep(vs) {
-        Ok(vals) => {
-            let lucky_number = rand::thread_rng().gen_range(0..vals.len());
-            let line = &vals[lucky_number];
-            writeln!(&mut stdout, "{}", line)?;
+    for func in funcs {
+        match func() {
+            Ok(vs) => vals.extend(vs),
+            Err(_) => println!("log io error for git_gstrsrep"),
         }
-        Err(_) => println!("log io error for git_grep"),
     }
+
+    let total_len = vals.len();
+
+    let lucky_number = rand::thread_rng().gen_range(0..total_len);
+    let line = &vals[lucky_number];
+    writeln!(&mut stdout, "{}", line)?;
 
     Ok(())
 }
