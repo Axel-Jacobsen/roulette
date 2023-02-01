@@ -57,6 +57,7 @@ pub fn mypy() -> io::Result<Vec<String>> {
     // path/to/file.rs:107: note: friend is a four letter word
     //
     // We want to keep the 'error' lines, but get rid of the 'note' lines
+    // TODO add option for `--pretty` cause prettier is better
 
     let mypy_line_output_regex =
         Regex::new(r"(?P<file_and_line>/?[a-zA-Z0-9_\-\./]+:\d+:) (?P<mypy_type>error|note):")
@@ -67,9 +68,9 @@ pub fn mypy() -> io::Result<Vec<String>> {
         .filter(|line| {
             let captures = match mypy_line_output_regex.captures(&line) {
                 Some(c) => c,
-                None => return false, // add 'DEBUG' option to program and log this case!
+                None => return false, // TODO add 'DEBUG' option to program and log this case!
             };
-            &captures["mypy_type"] != "error"
+            &captures["mypy_type"] == "error"
         })
         .collect())
 }
