@@ -80,6 +80,11 @@ pub fn ruff() -> io::Result<Vec<String>> {
     Ok(convert_output_to_vec_of_strs(command_output))
 }
 
+pub fn flake8() -> io::Result<Vec<String>> {
+    let command_output = Command::new("flake8").arg(".").output()?;
+    Ok(convert_output_to_vec_of_strs(command_output))
+}
+
 #[cfg(test)]
 mod main_tests {
     use crate::commands::synth_or;

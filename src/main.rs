@@ -5,7 +5,6 @@ use termcolor::{ColorChoice, ColorSpec, StandardStream, WriteColor};
 
 mod commands;
 
-
 fn get_output(funcs: &Vec<fn() -> std::io::Result<Vec<String>>>) -> Vec<String> {
     let mut vals: Vec<String> = vec![];
 
@@ -24,8 +23,12 @@ fn main() -> std::io::Result<()> {
     let mut stdout = StandardStream::stdout(ColorChoice::Always);
 
     // TODO filter funcs somehow!
-    let funcs: Vec<fn() -> std::io::Result<Vec<String>>> =
-        vec![commands::git_grep, commands::mypy, commands::ruff];
+    let funcs: Vec<fn() -> std::io::Result<Vec<String>>> = vec![
+        commands::git_grep,
+        commands::mypy,
+        commands::ruff,
+        commands::flake8,
+    ];
 
     let vals = get_output(&funcs);
 
