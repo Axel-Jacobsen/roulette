@@ -16,6 +16,12 @@ fn synth_or(strs: Vec<String>) -> String {
 }
 
 fn convert_output_to_vec_of_strs(output: Output) -> Vec<String> {
+    /* Converts Command Output to vector of strings, splitting output by newlines
+     *
+     * This should handle Output's Vec<u8> to a string type. Right now we assume
+     * all output is utf-8, but I don't think that this is necessarily true.
+     * On *nix, I *think* we can rely on $LANG.
+     */
     // TODO when will we get non-utf-8? Can we detect
     // the lang and change this accordingly?
     // output.stdout is Vec<u8>, so maybe we output
