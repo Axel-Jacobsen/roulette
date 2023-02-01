@@ -38,6 +38,7 @@ Run `roulette` in the same directory as the configuration files, and the tools (
 - `git grep -niE "(TODO|FIXME)"`
 - `mypy`
 - `ruff`
+- `flake8`
 
 ## Soon-to-be Supported Commands
 
