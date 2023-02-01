@@ -29,6 +29,10 @@ Number of 'pockets': 13
 README.md:8:- whatever TODO, FIXME, or type error you get, you must fix!
 ```
 
+## Configuration files
+
+Run `roulette` in the same directory as the configuration files, and the tools (`mypy` and `ruff` should be able to find it.
+
 ## Supported Commands
 
 - `git grep -niE "(TODO|FIXME)"`
