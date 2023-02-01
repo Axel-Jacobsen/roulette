@@ -9,7 +9,7 @@ fn main() -> std::io::Result<()> {
     let mut stdout = StandardStream::stdout(ColorChoice::Always);
 
     let mut vals: Vec<String> = vec![];
-    let funcs = [commands::git_grep, commands::mypy];
+    let funcs = [commands::git_grep, commands::mypy, commands::ruff];
 
     for func in funcs {
         match func() {
@@ -27,7 +27,12 @@ fn main() -> std::io::Result<()> {
 
     let total_len = vals.len();
     if total_len == 0 {
-        writeln!(&mut stdout, "{}", "there were no issues found, the roulette wheel is missing!")
+        writeln!(
+            &mut stdout,
+            "{}",
+            "there were no issues found, the roulette wheel is missing!"
+        )?;
+        return Ok(());
     }
 
     writeln!(&mut stdout, "{}", total_len)?;

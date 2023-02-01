@@ -33,12 +33,11 @@ README.md:8:- whatever TODO, FIXME, or type error you get, you must fix!
 
 - `git grep -niE "(TODO|FIXME)"`
 - `mypy`
+- `ruff`
 
 ## Soon-to-be Supported Commands
 
-- `ruff`
-
-What else?
+What else? [Let me know.](https://github.com/Axel-Jacobsen/roulette/issues)
 
 ## TODO
 

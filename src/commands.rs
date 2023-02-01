@@ -22,7 +22,7 @@ fn convert_output_to_vec_of_strs(output: Output) -> Vec<String> {
     // a Vec<u8> too?
     // TODO return an iterable so we can do further operations
     // on the output. If no further operations are needed, the
-    // calling function can `collect`.
+    // calling function can `collect`. Is this a good idea?
     String::from_utf8(output.stdout)
         .expect("non-utf8 output from terminal")
         .split("\n")
@@ -73,6 +73,11 @@ pub fn mypy() -> io::Result<Vec<String>> {
             &captures["mypy_type"] == "error"
         })
         .collect())
+}
+
+pub fn ruff() -> io::Result<Vec<String>> {
+    let command_output = Command::new("ruff").arg(".").arg("-q").output()?;
+    Ok(convert_output_to_vec_of_strs(command_output))
 }
 
 #[cfg(test)]
