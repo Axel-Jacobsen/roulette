@@ -26,6 +26,10 @@ fn main() -> std::io::Result<()> {
     stdout.set_color(&color_spec)?;
 
     let total_len = vals.len();
+    if total_len == 0 {
+        writeln!(&mut stdout, "{}", "there were no issues found, the roulette wheel is missing!")
+    }
+
     writeln!(&mut stdout, "{}", total_len)?;
 
     color_spec.clear();
