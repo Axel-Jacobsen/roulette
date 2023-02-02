@@ -17,8 +17,8 @@ struct Cli {
     #[arg(short, long, num_args = 0..)]
     grep_keywords: Option<Vec<String>>,
     /// Supported Commands
-    #[arg(short, long, action=clap::ArgAction::SetTrue)]
-    supported_commands: bool
+    #[arg(long, action=clap::ArgAction::SetTrue)]
+    supported: bool
 }
 
 
@@ -30,6 +30,10 @@ fn process_commands(args: Cli, funcs: HashMap<String, commands::TypeCommand>) ->
         None => funcs.keys().cloned().collect()
     };
 
+    // I know we iterate over commands_list twice, but I don't want
+    // to take forever processing mypy when the next command that
+    // was submitted was 'fwake8' which would just return an Err.
+    // Save user time!
     for func in command_list.iter() {
         if !funcs.contains_key(func) {
             return Err(format!("func {} not in supported commands", func));
@@ -95,7 +99,7 @@ fn main() -> std::io::Result<()> {
 
     let cli = Cli::parse();
 
-    if cli.supported_commands {
+    if cli.supported {
         for k in funcs.keys() { print!("{} ", k); }
         println!("");
         return Ok(());
