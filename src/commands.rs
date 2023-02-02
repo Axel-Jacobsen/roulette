@@ -6,9 +6,12 @@ use std::process::Output;
 use regex::Regex;
 use shell_escape::unix::escape;
 
-fn synth_or(strs: Vec<String>) -> String {
+
+use crate::cli;
+
+fn synth_or(strs: &Vec<String>) -> String {
     let or_expr = strs.into_iter().fold("".to_string(), |cur, nxt| {
-        let escaped_next = escape(Cow::Owned(nxt));
+        let escaped_next = escape(Cow::Owned(nxt.clone()));
         cur + "|" + &escaped_next
     });
 
@@ -38,12 +41,12 @@ fn convert_output_to_vec_of_strs(output: Output) -> Vec<String> {
 }
 
 // Not sure if this is the most "rustonic" way to do this!
-pub type TypeCommand = fn(Option<Vec<String>>) -> io::Result<Vec<String>>;
+pub type TypeCommand = fn(&cli::Cli) -> io::Result<Vec<String>>;
 
-pub fn git_grep(targets: Option<Vec<String>>) -> io::Result<Vec<String>> {
+pub fn git_grep(cli: &cli::Cli) -> io::Result<Vec<String>> {
     // git grep vs. grep? Prefer git grep, else grep
     let strs = ["FIXME", "TODO"].map(String::from).to_vec();
-    let grep_str = synth_or(targets.unwrap_or(strs));
+    let grep_str = synth_or(&cli.commands.clone().unwrap_or(strs));
     let command_output = Command::new("git")
         .arg("grep")
         .arg("--color=always")
@@ -55,7 +58,7 @@ pub fn git_grep(targets: Option<Vec<String>>) -> io::Result<Vec<String>> {
     Ok(convert_output_to_vec_of_strs(command_output))
 }
 
-pub fn mypy(_: Option<Vec<String>>) -> io::Result<Vec<String>> {
+pub fn mypy(_: &cli::Cli) -> io::Result<Vec<String>> {
     let command_output = Command::new("mypy")
         .arg(".")
         .arg("--no-error-summary")
@@ -84,12 +87,12 @@ pub fn mypy(_: Option<Vec<String>>) -> io::Result<Vec<String>> {
         .collect())
 }
 
-pub fn ruff(_: Option<Vec<String>>) -> io::Result<Vec<String>> {
+pub fn ruff(_: &cli::Cli) -> io::Result<Vec<String>> {
     let command_output = Command::new("ruff").arg(".").arg("-q").output()?;
     Ok(convert_output_to_vec_of_strs(command_output))
 }
 
-pub fn flake8(_: Option<Vec<String>>) -> io::Result<Vec<String>> {
+pub fn flake8(_: &cli::Cli) -> io::Result<Vec<String>> {
     let command_output = Command::new("flake8").arg(".").output()?;
     Ok(convert_output_to_vec_of_strs(command_output))
 }

@@ -5,28 +5,14 @@ use clap::Parser;
 use rand::Rng;
 use termcolor::{ColorChoice, ColorSpec, StandardStream, WriteColor};
 
+mod cli;
 mod commands;
 
-#[derive(Parser)]
-#[command(author, version, about, long_about = None)]
-struct Cli {
-    /// Commands to run (any of grep, mypy, ruff, flake8) - defaults to all of them
-    #[arg(short, long, num_args = 0..)]
-    commands: Option<Vec<String>>,
-    /// Optional keywords for grep: defaults to "TODO" and "FIXME"
-    #[arg(short, long, num_args = 0..)]
-    grep_keywords: Option<Vec<String>>,
-    /// Supported Commands
-    #[arg(long, action=clap::ArgAction::SetTrue)]
-    supported: bool
-}
-
-
-fn process_commands(args: Cli, funcs: HashMap<String, commands::TypeCommand>) -> Result<Vec<String>, String> {
+fn process_commands(args: cli::Cli, funcs: HashMap<String, commands::TypeCommand>) -> Result<Vec<String>, String> {
     let mut vals: Vec<String> = vec![];
 
-    let command_list = match args.commands {
-        Some(command_list) => command_list,
+    let command_list: Vec<String> = match &args.commands {
+        Some(cs) => cs.clone(),
         None => funcs.keys().cloned().collect()
     };
 
@@ -42,7 +28,7 @@ fn process_commands(args: Cli, funcs: HashMap<String, commands::TypeCommand>) ->
 
     // TODO run funcs concurrently?
     for func in command_list {
-        match funcs[&func](None) {
+        match funcs[&func](&args) {
             Ok(vs) => vals.extend(vs),
             Err(_) => {
                 // TODO deal w/ this error case
@@ -97,7 +83,7 @@ fn main() -> std::io::Result<()> {
     funcs.insert("ruff".to_string(), commands::ruff);
     funcs.insert("flake8".to_string(), commands::flake8);
 
-    let cli = Cli::parse();
+    let cli = cli::Cli::parse();
 
     if cli.supported {
         for k in funcs.keys() { print!("{} ", k); }
