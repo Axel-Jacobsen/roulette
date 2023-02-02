@@ -57,7 +57,7 @@ Run `roulette` in the same directory as the configuration files, and the tools (
 
 ## Supported Commands
 
-- `git grep"`
+- `git grep`
 - `ripgrep`
 - `grep`
 - `mypy`
