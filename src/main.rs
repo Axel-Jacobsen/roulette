@@ -16,16 +16,13 @@ struct Cli {
     /// Optional keywords for grep: defaults to "TODO" and "FIXME"
     #[arg(short, long, num_args = 0..)]
     grep_keywords: Option<Vec<String>>,
+    /// Supported Commands
+    #[arg(short, long, action=clap::ArgAction::SetTrue)]
+    supported_commands: bool
 }
 
 
-fn process_commands(args: Cli) -> Result<Vec<String>, String> {
-    let mut funcs: HashMap<String, commands::TypeCommand> = HashMap::new();
-    funcs.insert("grep".to_string(), commands::git_grep);
-    funcs.insert("mypy".to_string(), commands::mypy);
-    funcs.insert("ruff".to_string(), commands::ruff);
-    funcs.insert("flake8".to_string(), commands::flake8);
-
+fn process_commands(args: Cli, funcs: HashMap<String, commands::TypeCommand>) -> Result<Vec<String>, String> {
     let mut vals: Vec<String> = vec![];
 
     let command_list = match args.commands {
@@ -90,9 +87,21 @@ fn process_command_outputs(vals: Vec<String>) -> std::io::Result<()> {
 }
 
 fn main() -> std::io::Result<()> {
+    let mut funcs: HashMap<String, commands::TypeCommand> = HashMap::new();
+    funcs.insert("grep".to_string(), commands::git_grep);
+    funcs.insert("mypy".to_string(), commands::mypy);
+    funcs.insert("ruff".to_string(), commands::ruff);
+    funcs.insert("flake8".to_string(), commands::flake8);
+
     let cli = Cli::parse();
 
-    let vals = process_commands(cli).unwrap();
+    if cli.supported_commands {
+        for k in funcs.keys() { print!("{} ", k); }
+        println!("");
+        return Ok(());
+    }
+
+    let vals = process_commands(cli, funcs).unwrap();
 
     process_command_outputs(vals)
 }
