@@ -29,13 +29,37 @@ Number of 'pockets': 13
 README.md:8:- whatever TODO, FIXME, or type error you get, you must fix!
 ```
 
+For more options,
+
+```console
+$ roulette --help
+
+Spin the wheel, get a task!
+
+Usage: roulette [OPTIONS]
+
+Options:
+  -c, --commands [<COMMANDS>...]
+          Commands to run (any of git grep, ripgrep, grep, mypy, ruff, flake8) - defaults git grep and mypy
+  -g, --grep-keywords [<GREP_KEYWORDS>...]
+          Optional keywords for grep: defaults to "TODO" and "FIXME". We first try `git grep`, then `rip grep`, then just normal grep
+      --supported
+          Print supported commands
+  -h, --help
+          Print help
+  -V, --version
+          Print version
+```
+
 ## Configuration files
 
-Run `roulette` in the same directory as the configuration files, and the tools (`mypy` and `ruff` should be able to find it.
+Run `roulette` in the same directory as the configuration files, and the tools (e.g. `mypy` or `ruff`) should be able to find it.
 
 ## Supported Commands
 
-- `git grep -niE "(TODO|FIXME)"`
+- `git grep"`
+- `ripgrep`
+- `grep`
 - `mypy`
 - `ruff`
 - `flake8`
@@ -43,10 +67,3 @@ Run `roulette` in the same directory as the configuration files, and the tools (
 ## Soon-to-be Supported Commands
 
 What else? [Let me know.](https://github.com/Axel-Jacobsen/roulette/issues)
-
-## TODO
-
-- how to find commands to use?
-- Is UTF-8 OK for character interpretation?
-- stdout is interpreted as `Vec<u8>` - is this the 'natural' way to manage terminal output?
-- how to deal with config files for the commands? e.g. mypy.ini
