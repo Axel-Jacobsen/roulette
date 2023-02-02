@@ -6,7 +6,6 @@ use std::process::Output;
 use regex::Regex;
 use shell_escape::unix::escape;
 
-
 use crate::cli;
 
 fn synth_or(strs: &Vec<String>) -> String {
@@ -47,6 +46,7 @@ pub fn git_grep(cli: &cli::Cli) -> io::Result<Vec<String>> {
     // git grep vs. grep? Prefer git grep, else grep
     let strs = ["FIXME", "TODO"].map(String::from).to_vec();
     let grep_str = synth_or(&cli.grep_keywords.clone().unwrap_or(strs));
+
     let command_output = Command::new("git")
         .arg("grep")
         .arg("--color=always")
@@ -54,7 +54,34 @@ pub fn git_grep(cli: &cli::Cli) -> io::Result<Vec<String>> {
         .arg(grep_str)
         .output()?;
 
-    // assume stdout has valid utf8
+    Ok(convert_output_to_vec_of_strs(command_output))
+}
+
+pub fn rip_grep(cli: &cli::Cli) -> io::Result<Vec<String>> {
+    let strs = ["FIXME", "TODO"].map(String::from).to_vec();
+    let grep_str = synth_or(&cli.grep_keywords.clone().unwrap_or(strs));
+
+    let command_output = Command::new("rg")
+        .arg("--no-heading")
+        .arg(".")
+        .arg("-e")
+        .arg(grep_str)
+        .output()?;
+
+    Ok(convert_output_to_vec_of_strs(command_output))
+}
+
+pub fn grep(cli: &cli::Cli) -> io::Result<Vec<String>> {
+    let strs = ["FIXME", "TODO"].map(String::from).to_vec();
+    let grep_str = synth_or(&cli.grep_keywords.clone().unwrap_or(strs));
+
+    let command_output = Command::new("grep")
+        .arg("-rnw")
+        .arg(".")
+        .arg("-e")
+        .arg(grep_str)
+        .output()?;
+
     Ok(convert_output_to_vec_of_strs(command_output))
 }
 
@@ -70,7 +97,6 @@ pub fn mypy(_: &cli::Cli) -> io::Result<Vec<String>> {
     //
     // We want to keep the 'error' lines, but get rid of the 'note' lines
     // TODO add option for `--pretty` cause prettier is better
-
     let mypy_line_output_regex =
         Regex::new(r"(?P<file_and_line>/?[a-zA-Z0-9_\-\./]+:\d+:) (?P<mypy_type>error|note):")
             .expect("invalid regex!");

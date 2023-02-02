@@ -8,12 +8,15 @@ use termcolor::{ColorChoice, ColorSpec, StandardStream, WriteColor};
 mod cli;
 mod commands;
 
-fn process_commands(args: cli::Cli, funcs: HashMap<String, commands::TypeCommand>) -> Result<Vec<String>, String> {
+fn process_commands(
+    args: cli::Cli,
+    funcs: HashMap<String, commands::TypeCommand>,
+) -> Result<Vec<String>, String> {
     let mut vals: Vec<String> = vec![];
 
     let command_list: Vec<String> = match &args.commands {
         Some(cs) => cs.clone(),
-        None => funcs.keys().cloned().collect()
+        None => vec!["git_grep".to_string(), "mypy".to_string()],
     };
 
     // I know we iterate over commands_list twice, but I don't want
@@ -33,10 +36,9 @@ fn process_commands(args: cli::Cli, funcs: HashMap<String, commands::TypeCommand
             Err(_) => {
                 // TODO deal w/ this error case
                 ()
-            },
+            }
         }
     }
-
 
     Ok(vals)
 }
@@ -78,7 +80,9 @@ fn process_command_outputs(vals: Vec<String>) -> std::io::Result<()> {
 
 fn main() -> std::io::Result<()> {
     let mut funcs: HashMap<String, commands::TypeCommand> = HashMap::new();
-    funcs.insert("grep".to_string(), commands::git_grep);
+    funcs.insert("git_grep".to_string(), commands::git_grep);
+    funcs.insert("rip_grep".to_string(), commands::rip_grep);
+    funcs.insert("grep".to_string(), commands::grep);
     funcs.insert("mypy".to_string(), commands::mypy);
     funcs.insert("ruff".to_string(), commands::ruff);
     funcs.insert("flake8".to_string(), commands::flake8);
@@ -86,7 +90,9 @@ fn main() -> std::io::Result<()> {
     let cli = cli::Cli::parse();
 
     if cli.supported {
-        for k in funcs.keys() { print!("{} ", k); }
+        for k in funcs.keys() {
+            print!("{} ", k);
+        }
         println!("");
         return Ok(());
     }
