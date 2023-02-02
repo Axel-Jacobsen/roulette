@@ -46,7 +46,7 @@ pub type TypeCommand = fn(&cli::Cli) -> io::Result<Vec<String>>;
 pub fn git_grep(cli: &cli::Cli) -> io::Result<Vec<String>> {
     // git grep vs. grep? Prefer git grep, else grep
     let strs = ["FIXME", "TODO"].map(String::from).to_vec();
-    let grep_str = synth_or(&cli.commands.clone().unwrap_or(strs));
+    let grep_str = synth_or(&cli.grep_keywords.clone().unwrap_or(strs));
     let command_output = Command::new("git")
         .arg("grep")
         .arg("--color=always")
