@@ -1,38 +1,53 @@
+use std::collections::HashMap;
 use std::io::Write;
 
+use clap::Parser;
 use rand::Rng;
 use termcolor::{ColorChoice, ColorSpec, StandardStream, WriteColor};
 
+mod cli;
 mod commands;
 
-fn get_output(funcs: &Vec<fn() -> std::io::Result<Vec<String>>>) -> Vec<String> {
+fn process_commands(
+    args: cli::Cli,
+    funcs: HashMap<String, commands::TypeCommand>,
+) -> Result<Vec<String>, String> {
     let mut vals: Vec<String> = vec![];
 
-    // TODO run funcs concurrently?
-    for func in funcs {
-        match func() {
-            Ok(vs) => vals.extend(vs),
-            Err(_) => (),
+    let command_list: Vec<String> = match &args.commands {
+        Some(cs) => cs.clone(),
+        None => vec!["git_grep".to_string(), "mypy".to_string()],
+    };
+
+    // I know we iterate over commands_list twice, but I don't want
+    // to take forever processing mypy when the next command that
+    // was submitted was 'fwake8' which would just return an Err.
+    // Save user time!
+    for func in command_list.iter() {
+        if !funcs.contains_key(func) {
+            return Err(format!("func {} not in supported commands", func));
         }
     }
 
-    vals
+    // TODO run funcs concurrently?
+    for func in command_list {
+        match funcs[&func](&args) {
+            Ok(vs) => vals.extend(vs),
+            Err(_) => {
+                // TODO deal w/ this error case
+                ()
+            }
+        }
+    }
+
+    Ok(vals)
 }
 
-fn main() -> std::io::Result<()> {
+fn process_command_outputs(vals: Vec<String>) -> std::io::Result<()> {
     let mut stdout = StandardStream::stdout(ColorChoice::Always);
 
-    // TODO filter funcs somehow!
-    let funcs: Vec<fn() -> std::io::Result<Vec<String>>> = vec![
-        commands::git_grep,
-        commands::mypy,
-        commands::ruff,
-        commands::flake8,
-    ];
-
-    let vals = get_output(&funcs);
-
     let total_len = vals.len();
+
     if total_len == 0 {
         writeln!(
             &mut stdout,
@@ -61,4 +76,28 @@ fn main() -> std::io::Result<()> {
     writeln!(&mut stdout, "{}", line)?;
 
     Ok(())
+}
+
+fn main() -> std::io::Result<()> {
+    let mut funcs: HashMap<String, commands::TypeCommand> = HashMap::new();
+    funcs.insert("git_grep".to_string(), commands::git_grep);
+    funcs.insert("rip_grep".to_string(), commands::rip_grep);
+    funcs.insert("grep".to_string(), commands::grep);
+    funcs.insert("mypy".to_string(), commands::mypy);
+    funcs.insert("ruff".to_string(), commands::ruff);
+    funcs.insert("flake8".to_string(), commands::flake8);
+
+    let cli = cli::Cli::parse();
+
+    if cli.supported {
+        for k in funcs.keys() {
+            print!("{} ", k);
+        }
+        println!("");
+        return Ok(());
+    }
+
+    let vals = process_commands(cli, funcs).unwrap();
+
+    process_command_outputs(vals)
 }

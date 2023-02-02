@@ -6,9 +6,11 @@ use std::process::Output;
 use regex::Regex;
 use shell_escape::unix::escape;
 
-fn synth_or(strs: Vec<String>) -> String {
+use crate::cli;
+
+fn synth_or(strs: &Vec<String>) -> String {
     let or_expr = strs.into_iter().fold("".to_string(), |cur, nxt| {
-        let escaped_next = escape(Cow::Owned(nxt));
+        let escaped_next = escape(Cow::Owned(nxt.clone()));
         cur + "|" + &escaped_next
     });
 
@@ -16,6 +18,12 @@ fn synth_or(strs: Vec<String>) -> String {
 }
 
 fn convert_output_to_vec_of_strs(output: Output) -> Vec<String> {
+    /* Converts Command Output to vector of strings, splitting output by newlines
+     *
+     * This should handle Output's Vec<u8> to a string type. Right now we assume
+     * all output is utf-8, but I don't think that this is necessarily true.
+     * On *nix, I *think* we can rely on $LANG.
+     */
     // TODO when will we get non-utf-8? Can we detect
     // the lang and change this accordingly?
     // output.stdout is Vec<u8>, so maybe we output
@@ -31,10 +39,14 @@ fn convert_output_to_vec_of_strs(output: Output) -> Vec<String> {
         .collect()
 }
 
-pub fn git_grep() -> io::Result<Vec<String>> {
+// Not sure if this is the most "rustonic" way to do this!
+pub type TypeCommand = fn(&cli::Cli) -> io::Result<Vec<String>>;
+
+pub fn git_grep(cli: &cli::Cli) -> io::Result<Vec<String>> {
     // git grep vs. grep? Prefer git grep, else grep
     let strs = ["FIXME", "TODO"].map(String::from).to_vec();
-    let grep_str = synth_or(strs);
+    let grep_str = synth_or(&cli.grep_keywords.clone().unwrap_or(strs));
+
     let command_output = Command::new("git")
         .arg("grep")
         .arg("--color=always")
@@ -42,11 +54,38 @@ pub fn git_grep() -> io::Result<Vec<String>> {
         .arg(grep_str)
         .output()?;
 
-    // assume stdout has valid utf8
     Ok(convert_output_to_vec_of_strs(command_output))
 }
 
-pub fn mypy() -> io::Result<Vec<String>> {
+pub fn rip_grep(cli: &cli::Cli) -> io::Result<Vec<String>> {
+    let strs = ["FIXME", "TODO"].map(String::from).to_vec();
+    let grep_str = synth_or(&cli.grep_keywords.clone().unwrap_or(strs));
+
+    let command_output = Command::new("rg")
+        .arg("--no-heading")
+        .arg(".")
+        .arg("-e")
+        .arg(grep_str)
+        .output()?;
+
+    Ok(convert_output_to_vec_of_strs(command_output))
+}
+
+pub fn grep(cli: &cli::Cli) -> io::Result<Vec<String>> {
+    let strs = ["FIXME", "TODO"].map(String::from).to_vec();
+    let grep_str = synth_or(&cli.grep_keywords.clone().unwrap_or(strs));
+
+    let command_output = Command::new("grep")
+        .arg("-rnw")
+        .arg(".")
+        .arg("-e")
+        .arg(grep_str)
+        .output()?;
+
+    Ok(convert_output_to_vec_of_strs(command_output))
+}
+
+pub fn mypy(_: &cli::Cli) -> io::Result<Vec<String>> {
     let command_output = Command::new("mypy")
         .arg(".")
         .arg("--no-error-summary")
@@ -58,7 +97,6 @@ pub fn mypy() -> io::Result<Vec<String>> {
     //
     // We want to keep the 'error' lines, but get rid of the 'note' lines
     // TODO add option for `--pretty` cause prettier is better
-
     let mypy_line_output_regex =
         Regex::new(r"(?P<file_and_line>/?[a-zA-Z0-9_\-\./]+:\d+:) (?P<mypy_type>error|note):")
             .expect("invalid regex!");
@@ -75,12 +113,12 @@ pub fn mypy() -> io::Result<Vec<String>> {
         .collect())
 }
 
-pub fn ruff() -> io::Result<Vec<String>> {
+pub fn ruff(_: &cli::Cli) -> io::Result<Vec<String>> {
     let command_output = Command::new("ruff").arg(".").arg("-q").output()?;
     Ok(convert_output_to_vec_of_strs(command_output))
 }
 
-pub fn flake8() -> io::Result<Vec<String>> {
+pub fn flake8(_: &cli::Cli) -> io::Result<Vec<String>> {
     let command_output = Command::new("flake8").arg(".").output()?;
     Ok(convert_output_to_vec_of_strs(command_output))
 }
