@@ -1,11 +1,11 @@
+use std::collections::HashMap;
 use std::io::Write;
 
-use rand::Rng;
 use clap::Parser;
+use rand::Rng;
 use termcolor::{ColorChoice, ColorSpec, StandardStream, WriteColor};
 
 mod commands;
-
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -13,45 +13,52 @@ struct Cli {
     /// Commands to run (any of grep, mypy, ruff, flake8) - defaults to all of them
     #[arg(short, long, num_args = 0..)]
     commands: Option<Vec<String>>,
-    /// Optional keywords for grep: defaults to TODO and FIXME
+    /// Optional keywords for grep: defaults to "TODO" and "FIXME"
     #[arg(short, long, num_args = 0..)]
     grep_keywords: Option<Vec<String>>,
 }
 
 
-fn get_output(funcs: &Vec<fn() -> std::io::Result<Vec<String>>>) -> Vec<String> {
+fn process_commands(args: Cli) -> Result<Vec<String>, String> {
+    let mut funcs: HashMap<String, commands::TypeCommand> = HashMap::new();
+    funcs.insert("grep".to_string(), commands::git_grep);
+    funcs.insert("mypy".to_string(), commands::mypy);
+    funcs.insert("ruff".to_string(), commands::ruff);
+    funcs.insert("flake8".to_string(), commands::flake8);
+
     let mut vals: Vec<String> = vec![];
 
-    // TODO run funcs concurrently?
-    for func in funcs {
-        match func() {
-            Ok(vs) => vals.extend(vs),
-            Err(_) => (),
+    let command_list = match args.commands {
+        Some(command_list) => command_list,
+        None => funcs.keys().cloned().collect()
+    };
+
+    for func in command_list.iter() {
+        if !funcs.contains_key(func) {
+            return Err(format!("func {} not in supported commands", func));
         }
     }
 
-    vals
+    // TODO run funcs concurrently?
+    for func in command_list {
+        match funcs[&func](None) {
+            Ok(vs) => vals.extend(vs),
+            Err(_) => {
+                // TODO deal w/ this error case
+                ()
+            },
+        }
+    }
+
+
+    Ok(vals)
 }
 
-fn main() -> std::io::Result<()> {
-    let cli = Cli::parse();
-
-    println!("{:?}", cli.commands);
-    println!("{:?}", cli.grep_keywords);
-
+fn process_command_outputs(vals: Vec<String>) -> std::io::Result<()> {
     let mut stdout = StandardStream::stdout(ColorChoice::Always);
 
-    // TODO filter funcs somehow!
-    let funcs: Vec<fn() -> std::io::Result<Vec<String>>> = vec![
-        commands::git_grep,
-        commands::mypy,
-        commands::ruff,
-        commands::flake8,
-    ];
-
-    let vals = get_output(&funcs);
-
     let total_len = vals.len();
+
     if total_len == 0 {
         writeln!(
             &mut stdout,
@@ -80,4 +87,12 @@ fn main() -> std::io::Result<()> {
     writeln!(&mut stdout, "{}", line)?;
 
     Ok(())
+}
+
+fn main() -> std::io::Result<()> {
+    let cli = Cli::parse();
+
+    let vals = process_commands(cli).unwrap();
+
+    process_command_outputs(vals)
 }

@@ -37,10 +37,13 @@ fn convert_output_to_vec_of_strs(output: Output) -> Vec<String> {
         .collect()
 }
 
-pub fn git_grep() -> io::Result<Vec<String>> {
+// Not sure if this is the most "rustonic" way to do this!
+pub type TypeCommand = fn(Option<Vec<String>>) -> io::Result<Vec<String>>;
+
+pub fn git_grep(targets: Option<Vec<String>>) -> io::Result<Vec<String>> {
     // git grep vs. grep? Prefer git grep, else grep
     let strs = ["FIXME", "TODO"].map(String::from).to_vec();
-    let grep_str = synth_or(strs);
+    let grep_str = synth_or(targets.unwrap_or(strs));
     let command_output = Command::new("git")
         .arg("grep")
         .arg("--color=always")
@@ -52,7 +55,7 @@ pub fn git_grep() -> io::Result<Vec<String>> {
     Ok(convert_output_to_vec_of_strs(command_output))
 }
 
-pub fn mypy() -> io::Result<Vec<String>> {
+pub fn mypy(_: Option<Vec<String>>) -> io::Result<Vec<String>> {
     let command_output = Command::new("mypy")
         .arg(".")
         .arg("--no-error-summary")
@@ -81,12 +84,12 @@ pub fn mypy() -> io::Result<Vec<String>> {
         .collect())
 }
 
-pub fn ruff() -> io::Result<Vec<String>> {
+pub fn ruff(_: Option<Vec<String>>) -> io::Result<Vec<String>> {
     let command_output = Command::new("ruff").arg(".").arg("-q").output()?;
     Ok(convert_output_to_vec_of_strs(command_output))
 }
 
-pub fn flake8() -> io::Result<Vec<String>> {
+pub fn flake8(_: Option<Vec<String>>) -> io::Result<Vec<String>> {
     let command_output = Command::new("flake8").arg(".").output()?;
     Ok(convert_output_to_vec_of_strs(command_output))
 }
