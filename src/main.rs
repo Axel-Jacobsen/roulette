@@ -31,11 +31,9 @@ fn process_commands(
 
     // TODO run funcs concurrently?
     for func in command_list {
-        match funcs[&func](&args) {
-            Ok(vs) => vals.extend(vs),
-            Err(_) => {
-                // TODO deal w/ this error case
-            }
+        // TODO deal w/ this Err case
+        if let Ok(vs) = funcs[&func](&args) {
+            vals.extend(vs)
         }
     }
 
