@@ -8,7 +8,7 @@ use shell_escape::unix::escape;
 
 use crate::cli;
 
-fn synth_or(strs: &Vec<String>) -> String {
+fn synth_or(strs: &[String]) -> String {
     let or_expr = strs.iter().fold("".to_string(), |cur, nxt| {
         let escaped_next = escape(Cow::Owned(nxt.clone()));
         cur + "|" + &escaped_next
