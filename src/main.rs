@@ -25,7 +25,7 @@ fn process_commands(
     // Save user time!
     for func in command_list.iter() {
         if !funcs.contains_key(func) {
-            return Err(format!("func {} not in supported commands", func));
+            return Err(format!("func {func} not in supported commands"));
         }
     }
 
@@ -35,7 +35,6 @@ fn process_commands(
             Ok(vs) => vals.extend(vs),
             Err(_) => {
                 // TODO deal w/ this error case
-                ()
             }
         }
     }
@@ -51,7 +50,6 @@ fn process_command_outputs(vals: Vec<String>) -> std::io::Result<()> {
     if total_len == 0 {
         writeln!(
             &mut stdout,
-            "{}",
             "there were no issues found, the roulette wheel is missing!"
         )?;
         return Ok(());
@@ -64,7 +62,7 @@ fn process_command_outputs(vals: Vec<String>) -> std::io::Result<()> {
     color_spec.set_bold(true);
     stdout.set_color(&color_spec)?;
 
-    writeln!(&mut stdout, "{}", total_len)?;
+    writeln!(&mut stdout, "{total_len}")?;
 
     color_spec.clear();
     stdout.set_color(&color_spec)?;
@@ -73,7 +71,7 @@ fn process_command_outputs(vals: Vec<String>) -> std::io::Result<()> {
 
     let line = &vals[lucky_number];
 
-    writeln!(&mut stdout, "{}", line)?;
+    writeln!(&mut stdout, "{line}")?;
 
     Ok(())
 }
@@ -91,9 +89,9 @@ fn main() -> std::io::Result<()> {
 
     if cli.supported {
         for k in funcs.keys() {
-            print!("{} ", k);
+            print!("{k} ");
         }
-        println!("");
+        println!();
         return Ok(());
     }
 

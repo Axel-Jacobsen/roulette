@@ -9,7 +9,7 @@ use shell_escape::unix::escape;
 use crate::cli;
 
 fn synth_or(strs: &Vec<String>) -> String {
-    let or_expr = strs.into_iter().fold("".to_string(), |cur, nxt| {
+    let or_expr = strs.iter().fold("".to_string(), |cur, nxt| {
         let escaped_next = escape(Cow::Owned(nxt.clone()));
         cur + "|" + &escaped_next
     });
@@ -33,9 +33,9 @@ fn convert_output_to_vec_of_strs(output: Output) -> Vec<String> {
     // calling function can `collect`. Is this a good idea?
     String::from_utf8(output.stdout)
         .expect("non-utf8 output from terminal")
-        .split("\n")
+        .split('\n')
         .map(String::from)
-        .filter(|s| s != "")
+        .filter(|s| !s.is_empty())
         .collect()
 }
 
@@ -104,7 +104,7 @@ pub fn mypy(_: &cli::Cli) -> io::Result<Vec<String>> {
     Ok(convert_output_to_vec_of_strs(command_output)
         .into_iter()
         .filter(|line| {
-            let captures = match mypy_line_output_regex.captures(&line) {
+            let captures = match mypy_line_output_regex.captures(line) {
                 Some(c) => c,
                 None => return false, // TODO add 'DEBUG' option to program and log this case!
             };
