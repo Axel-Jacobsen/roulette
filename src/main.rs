@@ -82,6 +82,7 @@ fn main() -> std::io::Result<()> {
     funcs.insert("mypy".to_string(), commands::mypy);
     funcs.insert("ruff".to_string(), commands::ruff);
     funcs.insert("flake8".to_string(), commands::flake8);
+    funcs.insert("clippy".to_string(), commands::cargo_clippy);
 
     let cli = cli::Cli::parse();
 

@@ -123,6 +123,39 @@ pub fn flake8(_: &cli::Cli) -> io::Result<Vec<String>> {
     Ok(convert_output_to_vec_of_strs(command_output))
 }
 
+pub fn cargo_clippy(_: &cli::Cli) -> io::Result<Vec<String>> {
+    let command_output = Command::new("cargo")
+        .arg("clippy")
+        .arg("--color")
+        .arg("always")
+        .output()?;
+
+    if command_output.status.success() {
+        return Ok(vec![]);
+    }
+
+    let stderr_str =
+        String::from_utf8(command_output.stderr).expect("non-utf8 output from terminal");
+
+    let warnings_or_errors_regex =
+        Regex::new(r"(?P<issue>/?(?:warning|error).*)\n\n").expect("invalid regex!");
+
+    let warnings_and_errors: Vec<String> = stderr_str
+        .split("\n\n")
+        .map(String::from)
+        .filter(|line| {
+            match warnings_or_errors_regex.captures(line) {
+                Some(_) => false,
+                None => true, // TODO add 'DEBUG' option to program and log this case!
+            }
+        })
+        .collect();
+
+    let the_good_stuff = warnings_and_errors.split_last().unwrap().1;
+
+    Ok(the_good_stuff.to_vec())
+}
+
 #[cfg(test)]
 mod main_tests {
     use crate::commands::synth_or;
