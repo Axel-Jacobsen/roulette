@@ -63,6 +63,7 @@ Run `roulette` in the same directory as the configuration files, and the tools (
 - `mypy`
 - `ruff`
 - `flake8`
+- `clippy`
 
 ## Soon-to-be Supported Commands
 
