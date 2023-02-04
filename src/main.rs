@@ -25,7 +25,7 @@ fn process_commands(
             Ok(vs) => vals.extend(vs),
             Err(e) => {
                 if args.debug {
-                    println!("command failed: {:?}", e);
+                    println!("command failed: {e:?}");
                 }
             }
         }
