@@ -39,6 +39,8 @@ Spin the wheel, get a task!
 Usage: roulette [OPTIONS]
 
 Options:
+  -p, --path <PATH>
+          Path to directory (defaults to `.`). Note that `clippy` and `git grep` don't take a path, and require you to run `roulette` where you want the commands to be executed
   -c, --commands [<COMMANDS>...]
           Commands to run (any of git_grep, rip_grep, grep, mypy, ruff, flake8) - defaults git grep and mypy
   -g, --grep-keywords [<GREP_KEYWORDS>...]
@@ -51,7 +53,6 @@ Options:
           Print help
   -V, --version
           Print version
-
 ```
 
 ## Configuration files
