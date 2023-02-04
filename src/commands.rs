@@ -156,10 +156,8 @@ pub fn cargo_clippy(_: &cli::Cli) -> io::Result<Vec<String>> {
         .split("\n\n")
         .map(String::from)
         .filter(|line| {
-            match warnings_or_errors_regex.captures(line) {
-                Some(_) => false,
-                None => true, // TODO add 'DEBUG' option to program and log this case!
-            }
+            // TODO add 'DEBUG' option to program and log this case!
+            warnings_or_errors_regex.captures(line).is_none()
         })
         .collect();
 
