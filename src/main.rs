@@ -21,7 +21,6 @@ fn process_commands(
 
     // TODO run funcs concurrently?
     for func in command_list {
-        // TODO deal w/ this Err case
         match funcs[&func](&args) {
             Ok(vs) => vals.extend(vs),
             Err(e) => {

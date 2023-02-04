@@ -130,10 +130,6 @@ pub fn cargo_clippy(_: &cli::Cli) -> io::Result<Vec<String>> {
         .arg("always")
         .output()?;
 
-    if command_output.status.success() {
-        return Ok(vec![]);
-    }
-
     let stderr_str =
         String::from_utf8(command_output.stderr).expect("non-utf8 output from terminal");
 
