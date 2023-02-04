@@ -88,6 +88,14 @@ fn main() -> std::io::Result<()> {
         return Ok(());
     }
 
+    if let Some(path) = &cli.path {
+        if !path.is_dir() {
+            let path_display = path.display();
+            let path_str = format!("path {path_display} doesn't exist, or it isn't a directory");
+            return Err(std::io::Error::new(std::io::ErrorKind::NotFound, path_str));
+        }
+    }
+
     let vals = process_commands(cli, funcs).unwrap();
 
     process_command_outputs(vals)

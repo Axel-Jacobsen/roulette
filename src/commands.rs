@@ -1,5 +1,6 @@
 use std::borrow::Cow;
 use std::io;
+use std::path::PathBuf;
 use std::process::Command;
 use std::process::Output;
 
@@ -61,9 +62,12 @@ pub fn rip_grep(cli: &cli::Cli) -> io::Result<Vec<String>> {
     let strs = ["FIXME", "TODO"].map(String::from).to_vec();
     let grep_str = synth_or(&cli.grep_keywords.clone().unwrap_or(strs));
 
+    let binding = cli.path.clone().unwrap_or(PathBuf::from("."));
+    let path = binding.to_str().expect("invalid path");
+
     let command_output = Command::new("rg")
         .arg("--no-heading")
-        .arg(".")
+        .arg(path)
         .arg("-e")
         .arg(grep_str)
         .output()?;
@@ -75,9 +79,12 @@ pub fn grep(cli: &cli::Cli) -> io::Result<Vec<String>> {
     let strs = ["FIXME", "TODO"].map(String::from).to_vec();
     let grep_str = synth_or(&cli.grep_keywords.clone().unwrap_or(strs));
 
+    let binding = cli.path.clone().unwrap_or(PathBuf::from("."));
+    let path = binding.to_str().expect("invalid path");
+
     let command_output = Command::new("grep")
         .arg("-rnw")
-        .arg(".")
+        .arg(path)
         .arg("-e")
         .arg(grep_str)
         .output()?;
@@ -85,9 +92,12 @@ pub fn grep(cli: &cli::Cli) -> io::Result<Vec<String>> {
     Ok(convert_output_to_vec_of_strs(command_output))
 }
 
-pub fn mypy(_: &cli::Cli) -> io::Result<Vec<String>> {
+pub fn mypy(cli: &cli::Cli) -> io::Result<Vec<String>> {
+    let binding = cli.path.clone().unwrap_or(PathBuf::from("."));
+    let path = binding.to_str().expect("invalid path");
+
     let command_output = Command::new("mypy")
-        .arg(".")
+        .arg(path)
         .arg("--no-error-summary")
         .output()?;
 
@@ -113,13 +123,19 @@ pub fn mypy(_: &cli::Cli) -> io::Result<Vec<String>> {
         .collect())
 }
 
-pub fn ruff(_: &cli::Cli) -> io::Result<Vec<String>> {
-    let command_output = Command::new("ruff").arg(".").arg("-q").output()?;
+pub fn ruff(cli: &cli::Cli) -> io::Result<Vec<String>> {
+    let binding = cli.path.clone().unwrap_or(PathBuf::from("."));
+    let path = binding.to_str().expect("invalid path");
+
+    let command_output = Command::new("ruff").arg(path).arg("-q").output()?;
     Ok(convert_output_to_vec_of_strs(command_output))
 }
 
-pub fn flake8(_: &cli::Cli) -> io::Result<Vec<String>> {
-    let command_output = Command::new("flake8").arg(".").output()?;
+pub fn flake8(cli: &cli::Cli) -> io::Result<Vec<String>> {
+    let binding = cli.path.clone().unwrap_or(PathBuf::from("."));
+    let path = binding.to_str().expect("invalid path");
+
+    let command_output = Command::new("flake8").arg(path).output()?;
     Ok(convert_output_to_vec_of_strs(command_output))
 }
 
