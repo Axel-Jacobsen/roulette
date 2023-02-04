@@ -1,6 +1,6 @@
 [package]
 name = "fixme-roulette"
-version = "0.1.8"
+version = "0.1.81"
 edition = "2021"
 authors = ["Axel Jacobsen <axelnj44@gmail.com>"]
 license = "MIT"

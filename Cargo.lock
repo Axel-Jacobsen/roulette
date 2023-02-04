@@ -89,7 +89,7 @@ dependencies = [
 
 [[package]]
 name = "fixme-roulette"
-version = "0.1.8"
+version = "0.1.81"
 dependencies = [
  "clap",
  "rand",
