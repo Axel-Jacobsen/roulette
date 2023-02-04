@@ -171,7 +171,7 @@ mod main_tests {
     use crate::commands::synth_or;
 
     #[test]
-    fn basic_symbol_freq() {
+    fn basic_keyword_escaping() {
         let vs = ["FIXME", "TODO", "test", ":)"].map(String::from).to_vec();
         let res = synth_or(vs);
         assert_eq!(res, "(FIXME|TODO|test|':)')");
