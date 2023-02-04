@@ -40,15 +40,18 @@ Usage: roulette [OPTIONS]
 
 Options:
   -c, --commands [<COMMANDS>...]
-          Commands to run (any of git grep, ripgrep, grep, mypy, ruff, flake8) - defaults git grep and mypy
+          Commands to run (any of git_grep, rip_grep, grep, mypy, ruff, flake8) - defaults git grep and mypy
   -g, --grep-keywords [<GREP_KEYWORDS>...]
-          Optional keywords for grep: defaults to "TODO" and "FIXME". We first try `git grep`, then `rip grep`, then just normal grep
+          Optional keywords for grep: defaults to "TODO" and "FIXME"
       --supported
           Print supported commands
+      --debug
+          Print out failed commands (instead of silently ignoring, good for debugging)
   -h, --help
           Print help
   -V, --version
           Print version
+
 ```
 
 ## Configuration files
