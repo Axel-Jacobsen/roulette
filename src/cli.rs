@@ -14,4 +14,8 @@ pub struct Cli {
     /// Print supported commands
     #[arg(long, action=clap::ArgAction::SetTrue)]
     pub supported: bool,
+
+    /// Print out failed commands (instead of silently ignoring, good for debugging)
+    #[arg(long, action=clap::ArgAction::SetTrue)]
+    pub debug: bool,
 }

@@ -19,21 +19,16 @@ fn process_commands(
         None => vec!["git_grep".to_string(), "mypy".to_string()],
     };
 
-    // I know we iterate over commands_list twice, but I don't want
-    // to take forever processing mypy when the next command that
-    // was submitted was 'fwake8' which would just return an Err.
-    // Save user time!
-    for func in command_list.iter() {
-        if !funcs.contains_key(func) {
-            return Err(format!("func {func} not in supported commands"));
-        }
-    }
-
     // TODO run funcs concurrently?
     for func in command_list {
         // TODO deal w/ this Err case
-        if let Ok(vs) = funcs[&func](&args) {
-            vals.extend(vs)
+        match funcs[&func](&args) {
+            Ok(vs) => vals.extend(vs),
+            Err(e) => {
+                if args.debug {
+                    println!("command failed: {:?}", e);
+                }
+            }
         }
     }
 
