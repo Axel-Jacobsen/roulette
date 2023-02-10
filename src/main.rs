@@ -34,7 +34,7 @@ fn process_commands(
     Ok(vals)
 }
 
-fn process_command_outputs(vals: Vec<String>) -> std::io::Result<()> {
+fn process_command_outputs(cli: &cli::Cli, vals: Vec<String>) -> std::io::Result<()> {
     let mut stdout = StandardStream::stdout(ColorChoice::Always);
 
     let total_len = vals.len();
@@ -59,11 +59,18 @@ fn process_command_outputs(vals: Vec<String>) -> std::io::Result<()> {
     color_spec.clear();
     stdout.set_color(&color_spec)?;
 
-    let lucky_number = rand::thread_rng().gen_range(0..total_len);
+    if cli.all {
+        for line in vals {
+            writeln!(&mut stdout, "{line}")?;
+        }
+    } else {
+        let lucky_number = rand::thread_rng().gen_range(0..total_len);
+        let line = &vals[lucky_number];
+        writeln!(&mut stdout, "{line}")?;
+    }
 
-    let line = &vals[lucky_number];
-
-    writeln!(&mut stdout, "{line}")?;
+    color_spec.clear();
+    stdout.set_color(&color_spec)?;
 
     Ok(())
 }

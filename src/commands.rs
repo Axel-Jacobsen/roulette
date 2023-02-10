@@ -161,6 +161,7 @@ pub fn cargo_clippy(_: &cli::Cli) -> io::Result<Vec<String>> {
         })
         .collect();
 
+    // split_last returns Result<last, rest>, and we just want the rest, hence `.1`
     let the_good_stuff = warnings_and_errors.split_last().unwrap().1;
 
     Ok(the_good_stuff.to_vec())

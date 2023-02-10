@@ -25,4 +25,8 @@ pub struct Cli {
     /// Print out failed commands (instead of silently ignoring, good for debugging)
     #[arg(long, action=clap::ArgAction::SetTrue)]
     pub debug: bool,
+
+    /// Print out every result, useful for debugging
+    #[arg(long, action=clap::ArgAction::SetTrue)]
+    pub all: bool,
 }
