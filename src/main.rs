@@ -9,22 +9,22 @@ mod cli;
 mod commands;
 
 fn process_commands(
-    args: cli::Cli,
+    cli: &cli::Cli,
     funcs: HashMap<String, commands::TypeCommand>,
 ) -> Result<Vec<String>, String> {
     let mut vals: Vec<String> = vec![];
 
-    let command_list: Vec<String> = match &args.commands {
+    let command_list: Vec<String> = match &cli.commands {
         Some(cs) => cs.clone(),
         None => vec!["git_grep".to_string(), "mypy".to_string()],
     };
 
     // TODO run funcs concurrently?
     for func in command_list {
-        match funcs[&func](&args) {
+        match funcs[&func](&cli) {
             Ok(vs) => vals.extend(vs),
             Err(e) => {
-                if args.debug {
+                if cli.debug {
                     println!("command failed: {e:?}");
                 }
             }
@@ -103,7 +103,7 @@ fn main() -> std::io::Result<()> {
         }
     }
 
-    let vals = process_commands(cli, funcs).unwrap();
+    let vals = process_commands(&cli, funcs).unwrap();
 
-    process_command_outputs(vals)
+    process_command_outputs(&cli, vals)
 }
