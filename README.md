@@ -49,6 +49,8 @@ Options:
           Print supported commands
       --debug
           Print out failed commands (instead of silently ignoring, good for debugging)
+      --all
+          Print out every result, useful for debugging
   -h, --help
           Print help
   -V, --version
