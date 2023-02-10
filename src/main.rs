@@ -21,7 +21,7 @@ fn process_commands(
 
     // TODO run funcs concurrently?
     for func in command_list {
-        match funcs[&func](&cli) {
+        match funcs[&func](cli) {
             Ok(vs) => vals.extend(vs),
             Err(e) => {
                 if cli.debug {
