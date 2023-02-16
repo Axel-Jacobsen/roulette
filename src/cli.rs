@@ -11,11 +11,11 @@ pub struct Cli {
     pub path: Option<PathBuf>,
 
     /// Commands to run (any of git_grep, rip_grep, grep, mypy, ruff, flake8) - defaults git grep and mypy.
-    #[arg(short, long, num_args = 0..)]
+    #[arg(short, long, num_args = 1..)]
     pub commands: Option<Vec<String>>,
 
     /// Optional keywords for grep: defaults to "TODO" and "FIXME".
-    #[arg(short, long, num_args = 0..)]
+    #[arg(short, long, num_args = 1..)]
     pub grep_keywords: Option<Vec<String>>,
 
     /// Print supported commands
