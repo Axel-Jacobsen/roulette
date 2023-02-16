@@ -100,6 +100,7 @@ pub fn mypy(cli: &cli::Cli) -> io::Result<Vec<String>> {
         .arg(path)
         .arg("--no-error-summary")
         .arg("--color-output")
+        .arg("--hide-error-context")
         .arg("--pretty")
         .output()?;
 
@@ -133,12 +134,13 @@ pub fn mypy(cli: &cli::Cli) -> io::Result<Vec<String>> {
             None => current_line = [current_line, line].join("\n"),
         }
     }
+    collected_lines.push(current_line);
 
     // Get rid of first empty line
-    // TODO maybe this is horribly inefficient?
     collected_lines = if collected_lines.is_empty() {
         collected_lines
     } else {
+        // TODO maybe this is horribly inefficient?
         collected_lines[1..].to_vec()
     };
 
