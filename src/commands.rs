@@ -99,28 +99,45 @@ pub fn mypy(cli: &cli::Cli) -> io::Result<Vec<String>> {
     let command_output = Command::new("mypy")
         .arg(path)
         .arg("--no-error-summary")
+        .arg("--color-output")
+        .arg("--pretty")
         .output()?;
 
+    let stdout_str =
+        String::from_utf8(command_output.stdout).expect("non-utf8 output from terminal");
+
     // e.g.
-    // path/to/file.rs:107: error: blah blah
-    // path/to/file.rs:107: note: friend is a four letter word
+    // path/to/file.rs:107: error: blah blah blah not defined
+    //                     blah blah blah
+    //                     ^
+    // path/to/file.rs:107: note: what is a note but a thought in time?
     //
-    // We want to keep the 'error' lines, but get rid of the 'note' lines
-    // TODO add option for `--pretty` cause prettier is better
+    // We want to keep the 'error' lines, but get rid of the 'note' lines.
+    // Also, we want to capture the results of `--pretty`. I *think* pretty
+    // always ends with error location markers
     let mypy_line_output_regex =
-        Regex::new(r"(?P<file_and_line>/?[a-zA-Z0-9_\-\./]+:\d+:) (?P<mypy_type>error|note):")
+        Regex::new(r"(?P<file_and_line>/?[a-zA-Z0-9_\-\./ ]+:\d+:) (?P<mypy_type>error|note):.*")
             .expect("invalid regex!");
 
-    Ok(convert_output_to_vec_of_strs(command_output)
-        .into_iter()
-        .filter(|line| {
-            let captures = match mypy_line_output_regex.captures(line) {
-                Some(c) => c,
-                None => return false, // TODO add 'DEBUG' option to program and log this case!
-            };
-            &captures["mypy_type"] == "error"
-        })
-        .collect())
+    let mut current_line: String = String::new();
+    let mut collected_lines: Vec<String> = vec![];
+    for line in stdout_str.split('\n').map(String::from) {
+        match mypy_line_output_regex.captures(&line) {
+            Some(c) => {
+                if &c["mypy_type"] == "error" {
+                    collected_lines.push(current_line.clone());
+                    current_line = line;
+                } else {
+                    current_line = [current_line, line].join("\n")
+                }
+            },
+            None => current_line = [current_line, line].join("\n"),
+        }
+
+    }
+
+    // TODO maybe this is horribly inefficient?
+    Ok(collected_lines[1..].to_vec())
 }
 
 pub fn ruff(cli: &cli::Cli) -> io::Result<Vec<String>> {
