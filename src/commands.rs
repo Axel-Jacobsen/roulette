@@ -134,8 +134,15 @@ pub fn mypy(cli: &cli::Cli) -> io::Result<Vec<String>> {
         }
     }
 
+    // Get rid of first empty line
     // TODO maybe this is horribly inefficient?
-    Ok(collected_lines[1..].to_vec())
+    collected_lines = if collected_lines.is_empty() {
+        collected_lines
+    } else {
+        collected_lines[1..].to_vec()
+    };
+
+    Ok(collected_lines)
 }
 
 pub fn ruff(cli: &cli::Cli) -> io::Result<Vec<String>> {
