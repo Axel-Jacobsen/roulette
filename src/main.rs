@@ -14,9 +14,16 @@ fn process_commands(
 ) -> Result<Vec<String>, String> {
     let mut vals: Vec<String> = vec![];
 
+    let default = vec!["git_grep".to_string(), "mypy".to_string()];
     let command_list: Vec<String> = match &cli.commands {
-        Some(cs) => cs.clone(),
-        None => vec!["git_grep".to_string(), "mypy".to_string()],
+        Some(cs) => {
+            if !cs.is_empty() {
+                cs.clone()
+            } else {
+                default
+            }
+        }
+        None => default,
     };
 
     // TODO run funcs concurrently?

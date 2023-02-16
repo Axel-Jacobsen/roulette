@@ -108,19 +108,18 @@ pub fn mypy(cli: &cli::Cli) -> io::Result<Vec<String>> {
 
     // e.g.
     // path/to/file.rs:107: error: blah blah blah not defined
+    // path/to/file.rs:107: note: what is a note but a thought in time?
     //                     blah blah blah
     //                     ^
-    // path/to/file.rs:107: note: what is a note but a thought in time?
     //
-    // We want to keep the 'error' lines, but get rid of the 'note' lines.
-    // Also, we want to capture the results of `--pretty`. I *think* pretty
-    // always ends with error location markers
+    // We want to collect the error, note, explanation, and error marker into one 'unit'.
     let mypy_line_output_regex =
         Regex::new(r"(?P<file_and_line>/?[a-zA-Z0-9_\-\./ ]+:\d+:) (?P<mypy_type>error|note):.*")
             .expect("invalid regex!");
 
     let mut current_line: String = String::new();
     let mut collected_lines: Vec<String> = vec![];
+
     for line in stdout_str.split('\n').map(String::from) {
         match mypy_line_output_regex.captures(&line) {
             Some(c) => {
@@ -130,10 +129,9 @@ pub fn mypy(cli: &cli::Cli) -> io::Result<Vec<String>> {
                 } else {
                     current_line = [current_line, line].join("\n")
                 }
-            },
+            }
             None => current_line = [current_line, line].join("\n"),
         }
-
     }
 
     // TODO maybe this is horribly inefficient?
