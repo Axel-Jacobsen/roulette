@@ -114,6 +114,8 @@ pub fn mypy(cli: &cli::Cli) -> io::Result<Vec<String>> {
     //                     ^
     //
     // We want to collect the error, note, explanation, and error marker into one 'unit'.
+    // TODO support ANSI escape sequences so we can pipe color properly. Why was this not
+    // needed before?
     let mypy_line_output_regex =
         Regex::new(r"(?P<file_and_line>/?[a-zA-Z0-9_\-\./ ]+:\d+:) (?P<mypy_type>error|note):.*")
             .expect("invalid regex!");
